@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ابزار ثبت لینک مشتری</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto p-4 sm:p-6 md:p-8 max-w-4xl">
+        
+        <!-- بخش فرم برای مشتری -->
+        <div class="bg-white p-6 rounded-2xl shadow-lg mb-8">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center mb-2 text-indigo-600">ثبت جزئیات سفارش</h1>
+            <p class="text-center text-gray-500 mb-6">لطفاً اطلاعات زیر را برای ثبت سفارش خود با دقت تکمیل کنید.</p>
+            
+            <form id="linkForm" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="firstName" class="block mb-2 font-semibold text-gray-700">نام</label>
+                        <input type="text" id="firstName" placeholder="مثال: علی" required 
+                               class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-300">
+                    </div>
+                    <div>
+                        <label for="lastName" class="block mb-2 font-semibold text-gray-700">نام خانوادگی</label>
+                        <input type="text" id="lastName" placeholder="مثال: رضایی" required 
+                               class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-300">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="mobileNumber" class="block mb-2 font-semibold text-gray-700">شماره موبایل</label>
+                    <input type="tel" id="mobileNumber" placeholder="مثال: 09123456789" required
+                           class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-300" style="text-align: left; direction: ltr;">
+                </div>
+                
+                <div>
+                    <label for="address" class="block mb-2 font-semibold text-gray-700">آدرس</label>
+                    <textarea id="address" rows="3" placeholder="آدرس کامل خود را وارد کنید" required
+                              class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-300"></textarea>
+                </div>
+
+                <div>
+                    <label for="productLink" class="block mb-2 font-semibold text-gray-700">لینک محصول</label>
+                    <input type="url" id="productLink" placeholder="https://www.amazon.ae/..." required
+                           class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-300" style="text-align: left; direction: ltr;">
+                </div>
+
+                <div>
+                    <label for="description" class="block mb-2 font-semibold text-gray-700">توضیحات (اختیاری)</label>
+                    <textarea id="description" rows="3" placeholder="توضیحات اضافی مانند رنگ، سایز و ..."
+                              class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-300"></textarea>
+                </div>
+
+                <button type="submit" 
+                        class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-300 transition-all duration-300 ease-in-out transform hover:scale-105">
+                    ثبت و ارسال سفارش
+                </button>
+            </form>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl shadow-lg">
+            <h2 class="text-2xl sm:text-3xl font-bold text-center mb-6 text-gray-700">لیست سفارش‌های دریافتی</h2>
+            <div id="linkList" class="space-y-4">
+                <p id="emptyMessage" class="text-center text-gray-500 py-8">هنوز سفارشی ثبت نشده است.</p>
+            </div>
+        </div>
+        
+    </div>
+
+    <template id="linkItemTemplate">
+        <div class="link-item flex flex-col bg-gray-50 p-4 rounded-lg border border-gray-200 fade-in">
+            <div class="w-full flex flex-col sm:flex-row items-center justify-between mb-4 pb-4 border-b">
+                 <div class="flex-1 text-center sm:text-right mb-2 sm:mb-0">
+                    <p class="font-bold text-gray-800">مشتری: <span class="customer-name-display font-normal text-indigo-600"></span></p>
+                    <p class="font-bold text-gray-800">موبایل: <span class="customer-mobile-display font-normal text-gray-600" style="direction: ltr; display: inline-block;"></span></p>
+                </div>
+                <div class="flex space-x-2 space-x-reverse">
+                    <button class="copy-btn bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors duration-300 text-sm w-24">کپی لینک</button>
+                    <button class="remove-btn bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors duration-300 text-sm">حذف</button>
+                </div>
+            </div>
+            <div class="w-full space-y-3">
+                 <p class="font-semibold text-gray-800">آدرس:</p>
+                 <p class="customer-address-display bg-white p-2 rounded border text-gray-600 text-sm whitespace-pre-wrap"></p>
+                 <p class="font-semibold text-gray-800">لینک محصول:</p>
+                 <a href="#" target="_blank" class="product-link-display text-blue-500 hover:underline break-all block bg-white p-2 rounded border" style="direction: ltr; text-align: left;"></a>
+                 <p class="font-semibold text-gray-800">توضیحات:</p>
+                 <p class="customer-description-display bg-white p-2 rounded border text-gray-600 text-sm whitespace-pre-wrap"></p>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const linkForm = document.getElementById('linkForm');
+            const linkList = document.getElementById('linkList');
+            const linkItemTemplate = document.getElementById('linkItemTemplate');
+            let links = JSON.parse(localStorage.getItem('savedLinks')) || [];
+            function renderLinks() {
+                linkList.innerHTML = ''; 
+                if (links.length === 0) {
+                    if (!document.getElementById('emptyMessage')) {
+                         linkList.innerHTML = `<p id="emptyMessage" class="text-center text-gray-500 py-8">هنوز سفارشی ثبت نشده است.</p>`;
+                    } else {
+                        document.getElementById('emptyMessage').style.display = 'block';
+                    }
+                } else {
+                     if (document.getElementById('emptyMessage')) {
+                        document.getElementById('emptyMessage').style.display = 'none';
+                    }
+                    links.forEach((link, index) => {
+                        const itemClone = linkItemTemplate.content.cloneNode(true);
+                        itemClone.querySelector('.customer-name-display').textContent = `${link.firstName} ${link.lastName}`;
+                        itemClone.querySelector('.customer-mobile-display').textContent = link.mobile;
+                        itemClone.querySelector('.customer-address-display').textContent = link.address;
+                        itemClone.querySelector('.customer-description-display').textContent = link.description || 'ندارد';
+                        const linkTag = itemClone.querySelector('.product-link-display');
+                        linkTag.href = link.url;
+                        linkTag.textContent = link.url;
+                        const copyBtn = itemClone.querySelector('.copy-btn');
+                        copyBtn.addEventListener('click', () => {
+                            navigator.clipboard.writeText(link.url).then(() => {
+                                copyBtn.textContent = 'کپی شد!';
+                                copyBtn.classList.remove('bg-green-500');
+                                copyBtn.classList.add('bg-blue-500');
+                                setTimeout(() => {
+                                    copyBtn.textContent = 'کپی لینک';
+                                    copyBtn.classList.remove('bg-blue-500');
+                                    copyBtn.classList.add('bg-green-500');
+                                }, 2000);
+                            });
+                        });
+                        const removeBtn = itemClone.querySelector('.remove-btn');
+                        removeBtn.addEventListener('click', () => {
+                            links.splice(index, 1);
+                            saveLinks();
+                            renderLinks();
+                        });
+                        linkList.appendChild(itemClone);
+                    });
+                }
+            }
+            function saveLinks() {
+                localStorage.setItem('savedLinks', JSON.stringify(links));
+            }
+            linkForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const newLink = {
+                    firstName: document.getElementById('firstName').value,
+                    lastName: document.getElementById('lastName').value,
+                    mobile: document.getElementById('mobileNumber').value,
+                    address: document.getElementById('address').value,
+                    url: document.getElementById('productLink').value,
+                    description: document.getElementById('description').value,
+                };
+                links.push(newLink);
+                saveLinks();
+                renderLinks();
+                linkForm.reset();
+            });
+            renderLinks();
+        });
+    </script>
+
+</body>
+</html>
+
